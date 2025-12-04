@@ -230,13 +230,11 @@
 </head>
 <body>
     <div class="container">
-        <!-- Quiz Header -->
         <div id="quizHeader">
             <h1>Protection Style Mapping</h1>
             <p class="subtitle">Discover how your nervous system protects you, and what that means for your healing path.</p>
         </div>
 
-        <!-- Quiz Section -->
         <div id="quizSection" class="quiz-section active">
             <div class="progress-bar">
                 <div id="progressFill" class="progress-fill" style="width: 0%"></div>
@@ -250,7 +248,6 @@
             </div>
         </div>
 
-        <!-- Result Page -->
         <div id="resultPage" class="result-page"></div>
     </div>
 
@@ -475,13 +472,82 @@
                     { text: "Get frustrated but eventually give up", value: "c" },
                     { text: "Find another angle or wait for a better time to ask again", value: "d" }
                 ]
+            },
+            {
+                section: 5,
+                text: "When you pull away or go quiet in a relationship, what's usually happening inside?",
+                answers: [
+                    { text: "I'm overwhelmed and need to protect myself from feeling worse", value: "a" },
+                    { text: "I need space but I don't want to deal with their reaction", value: "b" },
+                    { text: "I don't pull away much", value: "c" },
+                    { text: "I'm avoiding a conversation I know will be uncomfortable for me", value: "b" }
+                ]
+            },
+            {
+                section: 5,
+                text: "Think of a time you ghosted or withdrew. What were you avoiding?",
+                answers: [
+                    { text: "More pain, more overwhelm, feeling worse than I already did", value: "a" },
+                    { text: "Being seen as the bad guy or having to explain myself", value: "b" },
+                    { text: "I haven't done this", value: "c" },
+                    { text: "Conflict or criticism that would damage how I see myself", value: "b" }
+                ]
+            },
+            {
+                section: 5,
+                text: "When someone is upset with you and you disappear, what are you protecting?",
+                answers: [
+                    { text: "My nervous system from overload", value: "a" },
+                    { text: "My self-image from being seen as wrong", value: "b" },
+                    { text: "I don't disappear when people are upset with me", value: "c" },
+                    { text: "Myself from having to admit fault or face consequences", value: "b" }
+                ]
+            },
+            {
+                section: 5,
+                text: "If you could stay present during hard conversations without any nervous system consequences, would you?",
+                answers: [
+                    { text: "Yes, I disappear because I literally can't handle it, not because I don't want to", value: "a" },
+                    { text: "Probably not - I don't WANT to deal with those conversations", value: "b" },
+                    { text: "I already do stay present", value: "c" },
+                    { text: "No - even if I could handle it, I'd rather avoid the discomfort", value: "b" }
+                ]
+            },
+            {
+                section: 5,
+                text: "When you withdraw from someone, what brings you back?",
+                answers: [
+                    { text: "When I feel regulated/safe enough to engage again", value: "a" },
+                    { text: "When I think they've calmed down or forgotten about it", value: "b" },
+                    { text: "I don't withdraw", value: "c" },
+                    { text: "When I've figured out how to frame things so I'm not the bad guy", value: "b" }
+                ]
+            },
+            {
+                section: 5,
+                text: "Do you disappear more when you're scared or when you're uncomfortable?",
+                answers: [
+                    { text: "When I'm scared/overwhelmed/triggered", value: "a" },
+                    { text: "When things are uncomfortable/awkward/reflect badly on me", value: "b" },
+                    { text: "Neither really", value: "c" },
+                    { text: "When I might look bad or be held accountable", value: "b" }
+                ]
+            },
+            {
+                section: 5,
+                text: "If someone said 'you always run away when things get hard,' your honest response would be:",
+                answers: [
+                    { text: "I'm not running away, I'm shutting down. There's a difference.", value: "a" },
+                    { text: "I don't run away, I just need space and they're too demanding.", value: "b" },
+                    { text: "I don't think I do that", value: "c" },
+                    { text: "Hard conversations aren't worth the drama they create.", value: "b" }
+                ]
             }
         ];
 
         let currentQuestion = 0;
         let userAnswers = [];
 
-        // Auto-start quiz on page load
         window.onload = function() {
             renderQuestion();
         };
@@ -568,46 +634,73 @@
 
             // Calculate intent score (Q16-20)
             let intentScore = 0;
-            if (userAnswers[15] === 'd') intentScore++; // Q16 - d only
-            if (userAnswers[16] === 'd') intentScore++; // Q17 - d only
-            if (userAnswers[17] === 'c' || userAnswers[17] === 'd') intentScore++; // Q18 - c or d
-            if (userAnswers[18] === 'd') intentScore++; // Q19 - d only
-            if (userAnswers[19] === 'd') intentScore++; // Q20 - d only
+            if (userAnswers[15] === 'd') intentScore++;
+            if (userAnswers[16] === 'd') intentScore++;
+            if (userAnswers[17] === 'c' || userAnswers[17] === 'd') intentScore++;
+            if (userAnswers[18] === 'd') intentScore++;
+            if (userAnswers[19] === 'd') intentScore++;
 
             // Consistency checks (Q21-22)
             const consistencyFlag = (userAnswers[20] === 'd' || userAnswers[21] === 'd');
 
-            // Determine categories
+            // Calculate avoidance type (Q23-29)
+            let traumaAvoidantScore = 0;
+            let egoAvoidantScore = 0;
+            let nonAvoidantScore = 0;
+
+            for (let i = 22; i < 29; i++) {
+                if (userAnswers[i] === 'a') {
+                    traumaAvoidantScore++;
+                } else if (userAnswers[i] === 'b') {
+                    egoAvoidantScore++;
+                } else if (userAnswers[i] === 'c') {
+                    nonAvoidantScore++;
+                }
+            }
+
+            // Determine avoidance category
+            let avoidanceType;
+            if (nonAvoidantScore >= 4) {
+                avoidanceType = 'non';
+            } else if (traumaAvoidantScore > egoAvoidantScore) {
+                avoidanceType = 'trauma';
+            } else {
+                avoidanceType = 'ego';
+            }
+
+            // Determine other categories
             let nervousSystem = nervousScore <= 3 ? 'offline' : (nervousScore <= 7 ? 'online' : 'overload');
             let conscience = conscienceScore <= 2 ? 'ethical' : 'nonethical';
             let intent = intentScore <= 2 ? 'accidental' : 'purposeful';
 
-            displayResults(nervousSystem, conscience, intent, consistencyFlag, nervousScore, conscienceScore, intentScore);
+            displayResults(nervousSystem, conscience, intent, avoidanceType, consistencyFlag);
         }
 
-        function displayResults(nervous, conscience, intent, consistency, nScore, cScore, iScore) {
+        function displayResults(nervous, conscience, intent, avoidance, consistency) {
             document.getElementById('quizSection').style.display = 'none';
             const resultPage = document.getElementById('resultPage');
             resultPage.classList.add('active');
 
-            let resultHTML = getResultContent(nervous, conscience, intent, consistency);
+            let resultHTML = getResultContent(nervous, conscience, intent, avoidance, consistency);
             resultPage.innerHTML = resultHTML;
 
-            // Log to console for debugging
-            console.log('Scores:', { nervous: nScore, conscience: cScore, intent: iScore });
-            console.log('Categories:', { nervous, conscience, intent, consistency });
-            console.log('Result key:', `${nervous}_${conscience}_${intent}`);
+            console.log('Categories:', { nervous, conscience, intent, avoidance, consistency });
+            console.log('Result key:', `${nervous}_${conscience}_${avoidance}_${intent}`);
         }
 
-        function getResultContent(nervous, conscience, intent, consistency) {
-            const key = `${nervous}_${conscience}_${intent}`;
+        function getResultContent(nervous, conscience, intent, avoidance, consistency) {
+            const key = `${nervous}_${conscience}_${avoidance}_${intent}`;
             
             const results = {
-                'overload_ethical_accidental': {
-                    title: 'System Overload + Ethical + Accidental',
-                    subtitle: 'The Burnout Cycle',
+                // SYSTEM OVERLOAD RESULTS
+                'overload_ethical_trauma_accidental': {
+                    title: 'System Overload + Trauma Avoidant + Accidental',
+                    subtitle: 'The Burnout Collapse',
                     content: `
-                        <p>Your system is cycling between extreme hypervigilance and total shutdown. You're tracking everything until you collapse, and when you hurt people, you're genuinely blind to it even when you're hyperaware of everything else. You DO have guilt circuits - the shame stays with you - but your nervous system is approaching breakdown.</p>
+                        <p>Your system is cycling between extreme hypervigilance and total shutdown. When you disappear, it's because you're genuinely overwhelmed - your nervous system is forcing you offline to protect you from further threat. You're not running from accountability, you're running from overload. When you hurt people, you're blind to it even when you're hyperaware of everything else. You DO have guilt circuits - the shame stays with you - but your system is approaching breakdown.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're watching you cycle between being intensely present and completely unreachable. They don't know which version of you they'll get, and when you disappear mid-crisis, they're left alone with whatever's happening. The guilt you carry afterward doesn't undo the abandonment they experienced when they needed you most.</p>
 
                         <h3>What this means:</h3>
                         <p>You're not manipulative, you're exhausted. Your system is screaming for stabilization before it fractures completely.</p>
@@ -625,113 +718,251 @@
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'offline_ethical_accidental': {
-                    title: 'Offline Protection + Ethical + Accidental',
-                    subtitle: 'The Disappearing Act',
+
+                'overload_ethical_ego_accidental': {
+                    title: 'System Overload + Ego Avoidant + Accidental',
+                    subtitle: 'The Crisis Escape Artist',
                     content: `
-                        <p>You're operating mostly offline - your system protects you by removing you from intense situations. You go blank, space out, genuinely don't remember conflicts. When people say you hurt them, you're confused because you weren't really present when it happened. You DO have conscience - you feel terrible when you find out - but you can't see your patterns in real-time.</p>
+                        <p>Your system is cycling between hypervigilance and collapse, but when you disappear, it's not because you can't handle it - it's because you don't want to deal with consequences, discomfort, or being seen as wrong. Your nervous system CAN handle staying present; you're choosing not to because the conversation threatens your self-image. When you hurt people, you're genuinely blind to it, but you're also quick to exit before you have to face what you've done.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're leaving them holding the damage while you protect yourself from having to look at it. Every time they try to address harm, you disappear - not because you're overwhelmed, but because you'd rather not deal with it. They're learning that bringing up problems means you'll vanish, so they stop bringing them up. The relationship warps around your avoidance.</p>
 
                         <h3>What this means:</h3>
-                        <p>You're not choosing to disappear, your system learned that not being there = safer. But now it's keeping you offline when you need to be present.</p>
+                        <p>You're in crisis AND you're using that crisis to avoid accountability. Both things are true. The system overload is real, but you're also weaponizing it.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li><strong>Mirror Archetype Quiz</strong> - Find out which specific protection pattern you're running (Fixer? Vanisher? Analyzer?)</li>
-                            <li><strong>Wound Matrix</strong> - Identify which of 18 core wounds is driving your system offline</li>
-                            <li><strong>Your archetype workbook</strong> - Learn to recognize your pattern before you disappear</li>
+                            <li><strong>Ground Zero Framework</strong> for stabilization</li>
+                            <li>Intensive accountability work - you need to learn to stay present even when it's uncomfortable</li>
+                            <li>Honest assessment: Are you trying to heal or trying to avoid consequences while appearing to heal?</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
-                        <p>People yelling at you to 'pay attention.' You need to understand what you're protecting so your system can learn it's safe to stay online.</p>
+                        <p>More validation that you're in crisis. You are, but that doesn't excuse the pattern.</p>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'online_ethical_accidental': {
-                    title: 'Online Protection + Ethical + Accidental',
-                    subtitle: 'The Constant Scanner',
+
+                'overload_ethical_non_accidental': {
+                    title: 'System Overload + Non-Avoidant + Accidental',
+                    subtitle: 'The Relentless Burnout',
                     content: `
-                        <p>You're hypervigilant - constantly tracking micro-expressions, adjusting in real-time, remembering every detail. You're exhausted from social interaction even when it 'goes well.' When you hurt people, you're genuinely surprised because you thought you were tracking everything. You have conscience - the guilt stays with you - but somehow you're blind to causing harm while being hyperaware of everything else.</p>
+                        <p>Your system is cycling between extreme hypervigilance and collapse, but you DON'T disappear - you stay present even when you probably shouldn't. You keep showing up, keep engaging, keep pushing through even when your system is screaming for you to stop. When you hurt people, you're genuinely blind to it because you're too dysregulated to track your impact while also trying to stay functional.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're running them over while your system is on fire. They can see you're not okay, but you won't stop or step back, so they're getting the full force of your dysregulation with no breaks. When they ask for space, you stay engaged because you don't have an off switch. They're exhausted from being around your intensity and they feel guilty for needing distance from someone who's clearly struggling.</p>
 
                         <h3>What this means:</h3>
-                        <p>That 'awareness' people admire is your threat response running 24/7. You're not manipulative, you're just trying to stay safe in a world that taught you missing one signal = danger.</p>
+                        <p>Your inability to withdraw is as damaging as other people's disappearing acts. You need circuit breakers - permission and capacity to go offline before you hit complete collapse.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li><strong>All War Fronts Framework</strong> - Understand what it means when every defense system is active simultaneously</li>
-                            <li><strong>War Types Assessment</strong> - Find out which threat responses (Fight/Flight/Freeze/Fawn) dominate your system</li>
-                            <li><strong>Ground Zero Framework</strong> if the intensity is making it hard to function</li>
+                            <li><strong>Ground Zero Framework</strong> - learn to recognize shutdown BEFORE it's forced on you</li>
+                            <li>Build deliberate withdrawal protocols - going offline strategically instead of waiting for collapse</li>
+                            <li>All War Fronts work once you're stable enough to engage with it</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
-                        <p>More awareness. You're already seeing too much. You need to learn you can lower the threat level and still be safe.</p>
-
-                        ${consistency ? '<p><em>Note: You have strategic skills in getting what you want from people, but based on your other answers, this appears to be about survival and communication rather than purposeful harm. You may be effective at influence while genuinely not seeing when it crosses into hurt.</em></p>' : ''}
+                        <p>Praise for "staying in the game." You're staying past the point of functionality and it's hurting everyone.</p>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'online_nonethical_accidental': {
-                    title: 'Online Protection + Non-Ethical + Accidental',
-                    subtitle: 'Strategic But Blind',
+
+                'overload_ethical_trauma_purposeful': {
+                    title: 'System Overload + Trauma Avoidant + Purposeful',
+                    subtitle: 'Crisis With Conscious Harm',
                     content: `
-                        <p>You're hypervigilant and strategic - you track reactions, adjust tactics, know how to get what you want from people. But based on your answers, when you hurt people it's genuinely not on purpose. You're blind to causing harm even while being hyperaware of everything else. Your conscience circuits either aren't firing or are overridden by survival needs.</p>
+                        <p>Your system is cycling between hypervigilance and collapse, you disappear when genuinely overwhelmed, you DO have active conscience (guilt stays with you), but you've admitted to purposefully causing harm when you're aware enough to do so. You feel remorse but you still choose to hurt people. Either you're in so much pain that causing harm feels like survival, or there's a disconnect between feeling bad and stopping the behavior.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're managing your crisis while also being deliberately harmed by you in moments when you have enough awareness to be strategic. You feel bad about it afterward, but that guilt doesn't stop you from doing it again. They're trapped in a cycle where your remorse looks like accountability but never translates to behavior change. The crisis gives you cover for harm that's actually purposeful.</p>
 
                         <h3>What this means:</h3>
-                        <p>You're effective at influence but disconnected from impact. The strategy and the harm exist in separate compartments. This might be architectural fracture - permanent compartmentalization that won't integrate through conventional healing.</p>
+                        <p>You're in system breakdown but you're also making choices to hurt people and feeling bad about it later. The crisis is real AND you're weaponizing it.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li><strong>Ground Zero Framework</strong> - This addresses compartmentalization that can't be 'integrated'</li>
-                            <li><strong>All War Fronts work</strong> - Your hypervigilance is about survival, not malice, but it's still causing damage</li>
-                            <li>Honest assessment: Can you ACCESS remorse if you tried, or is that wiring genuinely absent? The answer changes everything.</li>
+                            <li>Immediate professional support - this needs clinical intervention</li>
+                            <li>Honest question: What are you getting from causing purposeful harm that feels worth the guilt?</li>
+                            <li>Ground Zero Framework for stabilization alongside intensive accountability work</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
-                        <p>Shame about lacking empathy. If the wiring isn't there, guilting yourself won't build it. But you DO need to know whether you're protecting others from your pattern or expecting them to adapt to it.</p>
-
-                        ${consistency ? '<p><em>Note: Your consistency check confirms strategic awareness - you know how to get what you want from people. The question is whether you can learn to track impact alongside strategy.</em></p>' : ''}
+                        <p>Self-guided frameworks alone. You need supervised support to address both the system breakdown and the deliberate harm pattern.</p>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'offline_nonethical_accidental': {
-                    title: 'Offline Protection + Non-Ethical + Accidental',
-                    subtitle: 'Disconnected Defense',
+
+                'overload_ethical_ego_purposeful': {
+                    title: 'System Overload + Ego Avoidant + Purposeful',
+                    subtitle: 'Crisis Manipulation',
                     content: `
-                        <p>You're mostly offline - dissociated, can't remember conflicts, genuinely confused when people say you hurt them. AND your conscience circuits aren't firing - no guilt staying with you, you move on quickly. When you hurt people, it's accidental (you're not aware enough to be purposeful), but you also don't seem to feel bad about it after.</p>
+                        <p>Your system is in crisis, you disappear to avoid accountability (not from overwhelm), you have conscience, but you also purposefully harm people. You're using system overload as cover while making calculated choices to hurt people, then disappearing before facing consequences, but still feeling guilty after.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're dealing with your crisis, your purposeful harm, AND your strategic exits from accountability - with just enough guilt to look remorseful but never enough to change. You weaponize both the crisis and the avoidance while performing conscience.</p>
 
                         <h3>What this means:</h3>
-                        <p>This could be two things: (1) Extreme dissociation is blocking access to both memory AND feelings, or (2) The wiring for remorse was never built/got shut off permanently early.</p>
+                        <p>The crisis might be real, but you're also using it strategically. The guilt might be real, but it's not stopping the pattern.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li><strong>Mirror Archetype Quiz FIRST</strong> - You need to see your patterns before anything else can work</li>
-                            <li>Reassess conscience after you're more online - The 'non-ethical' score might be survival override, not true absence</li>
-                            <li>If remorse circuits genuinely aren't there: this work focuses on managing your pattern, not healing a wound that might not exist</li>
+                            <li>Immediate professional accountability work</li>
+                            <li>Ground Zero Framework if stabilization is genuinely needed</li>
+                            <li>Honest assessment: Is the crisis real or convenient?</li>
                         </ul>
-
-                        <h3>What you DON'T need:</h3>
-                        <p>People telling you that you 'should' feel bad. If you don't, you don't. The question is whether you CAN'T access it or genuinely don't have it.</p>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'overload_nonethical_purposeful': {
-                    title: 'System Overload + Non-Ethical + Purposeful',
-                    subtitle: 'Critical Alert',
+
+                'overload_ethical_non_purposeful': {
+                    title: 'System Overload + Non-Avoidant + Purposeful',
+                    subtitle: 'Relentless Calculated Harm',
                     content: `
-                        <p>Your system is cycling between hypervigilance and collapse, you're not accessing remorse about damage you cause, AND you're purposefully hurting people when you're aware enough to do so.</p>
+                        <p>Your system is in crisis, you don't disappear (you stay relentlessly present), you have conscience, but you purposefully harm people. You're in breakdown while making calculated choices to hurt people, staying present for all of it, and feeling bad after.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're experiencing your crisis intensity with no breaks, plus deliberate harm, plus your remorse that never prevents recurrence. You're overwhelming them with dysregulation AND purposeful damage, and you won't give them space from either.</p>
 
                         <h3>What this means:</h3>
-                        <p>You're approaching complete system breakdown while also being actively harmful to others. This is the most dangerous combination - for you AND for people around you.</p>
+                        <p>You're aware enough to choose harm but dysregulated enough to be in crisis. The guilt is real but ineffective.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li>Immediate professional clinical support - This is beyond self-guided frameworks</li>
-                            <li>Honest question: Are you trying to stop the cycle or trying to survive it while continuing to harm?</li>
-                            <li>If you're genuinely trying to change: intensive stabilization + accountability work with clinical supervision</li>
-                            <li>If you're not trying to change: at minimum, warn people around you what they're dealing with</li>
+                            <li>Immediate professional intervention</li>
+                            <li>Learn forced withdrawal - you need circuit breakers</li>
+                            <li>Intensive accountability alongside stabilization</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'overload_nonethical_trauma_accidental': {
+                    title: 'System Overload + Trauma Avoidant + No Remorse',
+                    subtitle: 'Critical Shutdown Without Conscience',
+                    content: `
+                        <p>Your system is cycling between hypervigilance and collapse, you're not accessing remorse circuits, and when you disappear it's from genuine overwhelm - not ego protection. When you hurt people, it's accidental (you're blind to it), but you also don't feel bad about it after. The lack of guilt might be because your system is so overloaded it can't handle more feelings, or it might be that the wiring was never there.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're cycling between intense dysregulation and complete shutdown, causing damage in both states, and showing no remorse for any of it. They're managing your crisis while you're either overwhelming them with your intensity or disappearing entirely - and you don't seem to feel bad about what that's doing to them. They can't tell if you CAN'T access guilt or if you just don't care.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're approaching system breakdown while being disconnected from your impact. You need stabilization just to assess whether conscience circuits can come online or if they're structurally absent.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li><strong>Ground Zero Framework</strong> - immediate nervous system stabilization before anything else</li>
+                            <li>Once stable: reassess whether remorse is blocked or genuinely absent</li>
+                            <li>Professional support if you're losing time or reality feels unstable</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Shame about not feeling bad. Your system is in crisis. First priority is stabilization, then we assess what's actually there.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'overload_nonethical_ego_accidental': {
+                    title: 'System Overload + Ego Avoidant + No Remorse',
+                    subtitle: 'Crisis Avoidance Without Conscience',
+                    content: `
+                        <p>Your system is cycling between hypervigilance and collapse, you're not accessing remorse, and when you disappear it's to avoid discomfort or accountability - not because you're overwhelmed. When you hurt people, you're blind to it in the moment, but you also don't feel bad about it after AND you strategically exit before anyone can address it with you.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're in crisis, causing damage, showing no remorse, AND disappearing whenever they try to address any of it. They're managing your breakdown, absorbing your impact, and getting no accountability or repair. Every time they try to talk about what's happening, you vanish - not because you can't handle it, but because you don't want to deal with it. They're trapped in a relationship with someone who's both in crisis and using that crisis to avoid all responsibility.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're in system overload AND using it to escape consequences. Both things are true. The crisis is real, but you're also weaponizing it to avoid accountability while not feeling bad about any of it.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Immediate professional support - this needs clinical intervention</li>
+                            <li>Ground Zero Framework alongside intensive accountability work</li>
+                            <li>Honest question: Can you access remorse if you tried, or is it genuinely absent?</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Self-guided frameworks alone. This pattern needs supervised intervention.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'overload_nonethical_non_accidental': {
+                    title: 'System Overload + Non-Avoidant + No Remorse',
+                    subtitle: 'Relentless Crisis Without Conscience',
+                    content: `
+                        <p>Your system is cycling between hypervigilance and collapse, you're not accessing remorse, and you DON'T disappear - you stay present even when you're massively dysregulated. When you hurt people, you're blind to it because you're too overwhelmed to track impact, but you also don't feel bad about it afterward. Your persistence means people can't get distance from your crisis state, and your lack of remorse means they get no repair.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're drowning in your dysregulation with no breaks and no accountability. You stay engaged even when you're a hurricane, you cause damage you don't see, and you don't feel bad about any of it. They can't get space from you because you don't withdraw, and they can't get repair from you because you don't access guilt. They're just absorbing impact with no relief and no resolution.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're in critical system breakdown, causing persistent harm, with no remorse circuits firing and no protective withdrawal to give people breaks. This is the most relentless version of crisis - for you and everyone around you.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Immediate professional clinical support</li>
+                            <li>Ground Zero Framework for stabilization</li>
+                            <li>Learn forced withdrawal protocols - you need circuit breakers even if they don't come naturally</li>
+                            <li>Assess whether remorse is blocked by crisis or structurally absent</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Praise for persistence. You need to learn to stop before you completely fracture yourself and everyone around you.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'overload_nonethical_trauma_purposeful': {
+                    title: 'System Overload + Trauma Avoidant + Calculated Harm',
+                    subtitle: 'Crisis With Strategic Damage',
+                    content: `
+                        <p>Your system is in crisis, you disappear from genuine overwhelm, you're not accessing remorse, AND you purposefully harm people when aware enough. You're in breakdown while also making calculated choices to hurt people, with no guilt stopping you.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're dealing with your crisis cycling, your disappearances, your purposeful harm, and zero remorse for any of it. The overwhelm might be real, but the harm is chosen, and there's no conscience creating accountability.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're approaching fracture while actively harming others without remorse. This is extremely dangerous territory.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Immediate professional clinical intervention</li>
+                            <li>Honest question: Are you trying to change or survive while continuing to harm?</li>
+                            <li>If genuinely trying to change: intensive supervised work</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'overload_nonethical_ego_purposeful': {
+                    title: 'System Overload + Ego Avoidant + Calculated Harm',
+                    subtitle: 'Critical Breakdown With Deliberate Damage',
+                    content: `
+                        <p>Your system is cycling between hypervigilance and collapse, you're not accessing remorse, you disappear to avoid accountability, AND you're purposefully hurting people when aware enough to do so. You're approaching complete system breakdown while also being actively harmful without guilt stopping you.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're dealing with someone in crisis who's also deliberately harming them, avoiding all accountability, and feeling no remorse about it. Your system breakdown makes you volatile and unpredictable, but underneath that chaos you're also making calculated choices to cause harm. They can't tell what's crisis and what's cruelty, but both are happening and neither comes with accountability.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're approaching complete fracture while also being actively harmful to others. This is the most dangerous combination - for you AND for people around you.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Immediate professional clinical support - this is beyond self-guided frameworks</li>
+                            <li>Honest question: Are you trying to stop the cycle or survive it while continuing to harm?</li>
+                            <li>If genuinely trying to change: intensive stabilization plus accountability work with clinical supervision</li>
+                            <li>If not trying to change: at minimum, warn people what they're dealing with</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
@@ -740,95 +971,121 @@
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'overload_nonethical_accidental': {
-                    title: 'System Overload + Non-Ethical + Accidental',
-                    subtitle: 'Critical Cycle Without Remorse',
+
+                'overload_nonethical_non_purposeful': {
+                    title: 'System Overload + Non-Avoidant + Calculated Harm',
+                    subtitle: 'Relentless Crisis With Deliberate Damage',
                     content: `
-                        <p>Your system is cycling between extreme hypervigilance and complete shutdown, you're not accessing remorse circuits, but when you hurt people it's genuinely accidental - you're blind to it even in your hypervigilant states.</p>
+                        <p>Your system is in crisis, you don't withdraw (staying relentlessly present), you're not accessing remorse, AND you purposefully harm people. You're in breakdown while making calculated choices to hurt people, staying present for all of it, with no guilt circuits firing.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're experiencing unrelenting dysregulation plus deliberate harm plus zero remorse plus no escape because you won't leave. This is the most overwhelming version of harm - crisis intensity, purposeful damage, persistent presence, no accountability.</p>
 
                         <h3>What this means:</h3>
-                        <p>You're approaching system breakdown while being disconnected from your impact. The lack of remorse might be survival override (your system can't handle more feelings), or it might be structural absence. You need stabilization to even assess which one it is.</p>
+                        <p>You're in critical breakdown while being calculatedly harmful with no conscience interrupting the pattern and no withdrawal giving anyone relief.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li><strong>Ground Zero Framework</strong> - Immediate nervous system stabilization before anything else</li>
-                            <li>Once stable enough: reassess whether conscience circuits can come online or if they're genuinely absent</li>
-                            <li>Professional support if you're losing time or reality feels unstable</li>
+                            <li>Immediate professional intervention - this is emergency territory</li>
+                            <li>Honest question: Are you trying to change?</li>
+                            <li>If yes: intensive supervised stabilization and accountability work</li>
+                            <li>If no: this framework isn't for you</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                // ONLINE PROTECTION RESULTS
+                'online_ethical_trauma_accidental': {
+                    title: 'Online + Trauma Avoidant + Accidental',
+                    subtitle: 'The Hypervigilant Vanisher',
+                    content: `
+                        <p>You're hypervigilant - constantly tracking micro-expressions, adjusting in real-time, remembering every detail. You're exhausted from social interaction even when it goes well. When things get too intense, your system forces you offline - you disappear because you're genuinely overwhelmed, not because you're avoiding accountability. When you hurt people, you're surprised because you thought you were tracking everything. You have conscience - the guilt stays with you - but somehow you're blind to causing harm while being hyperaware of everything else.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're intensely present until suddenly you're gone. They experience you as either fully engaged or completely unreachable - there's no middle ground. When they need you during hard moments, you vanish because your system can't handle more input. They're left managing both the original problem AND your absence. Over time, they learn not to come to you with anything difficult because they know you'll disappear.</p>
+
+                        <h3>What this means:</h3>
+                        <p>That "awareness" people admire is your threat response running 24/7. You're not manipulative, you're just trying to stay safe in a world that taught you missing one signal means danger. But the same system that keeps you hypervigilant also forces you offline when threat gets too high.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li><strong>All War Fronts Framework</strong> - Understand what it means when every defense system is active simultaneously</li>
+                            <li><strong>War Types Assessment</strong> - Find out which threat responses dominate your system</li>
+                            <li>Learn to recognize the signs BEFORE you're forced offline so you can communicate what's happening</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
-                        <p>Shame about not feeling bad. Your system is in crisis. First priority is stabilization, then we can assess what's actually there.</p>
+                        <p>More awareness. You're already seeing too much. You need to learn you can lower the threat level and still be safe.</p>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'overload_ethical_purposeful': {
-                    title: 'System Overload + Ethical + Purposeful',
-                    subtitle: 'Aware and Hurting',
+
+                'online_ethical_ego_accidental': {
+                    title: 'Online + Ego Avoidant + Accidental',
+                    subtitle: 'The Strategic Vanisher',
                     content: `
-                        <p>Your system is cycling between hypervigilance and collapse, you DO have active conscience (the guilt stays with you), but you've admitted to purposefully causing harm when you're aware enough to do so.</p>
+                        <p>You're hypervigilant and tracking everything constantly, but when you disappear, it's not because you can't handle it - it's because you don't want to deal with discomfort, potential criticism, or being seen as wrong. Your nervous system CAN handle staying present; you're choosing not to because the conversation threatens your self-image. When you hurt people, you're genuinely blind to it, but you're also quick to exit before anyone can hold you accountable.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're using your awareness skills to know exactly when to leave. You track their reactions carefully until you sense criticism or accountability coming, then you disappear. They're stuck in a pattern where they can never address problems because bringing up your impact triggers your exit. The hypervigilance you use to stay "connected" is actually helping you avoid real connection by giving you early warning to escape.</p>
 
                         <h3>What this means:</h3>
-                        <p>This is rare - you feel remorse but you still choose to hurt people. Either you're in so much pain that causing harm feels like the only option, or there's a disconnect between feeling bad and stopping the behavior.</p>
+                        <p>You're not protecting yourself from threat, you're protecting your self-image from discomfort. The tracking skills are real, the strategic awareness is real, but you're using them to avoid growth instead of facilitating it.</p>
 
                         <h3>Your path:</h3>
                         <ul>
-                            <li>Immediate professional support - this pattern needs clinical intervention</li>
-                            <li>Honest question: What are you getting from causing purposeful harm that feels worth the guilt?</li>
-                            <li>Ground Zero Framework + intensive accountability work</li>
+                            <li>All War Fronts Framework to understand your defensive patterns</li>
+                            <li>Intensive accountability work - learn to stay present even when you look bad</li>
+                            <li>Honest assessment: What are you more committed to - your self-image or your relationships?</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
-                        <p>Self-guided frameworks alone. You need supervised support to address both the system breakdown and the purposeful harm pattern.</p>
+                        <p>More awareness tools. You're already seeing everything - you're just using that sight to know when to run.</p>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'offline_ethical_purposeful': {
-                    title: 'Offline Protection + Ethical + Purposeful',
-                    subtitle: 'Contradiction to Examine',
+
+                'online_ethical_non_accidental': {
+                    title: 'Online + Non-Avoidant + Accidental',
+                    subtitle: 'The Persistent Steamroller',
                     content: `
-                        <p>Your answers suggest you're mostly offline/dissociated, you have active conscience, but you've also indicated purposeful harm. This is contradictory - you can't strategically hurt people while genuinely dissociated.</p>
+                        <p>You're hypervigilant - constantly tracking reactions, adjusting tactics, remembering everything. But you DON'T disappear when things get hard. You stay present, keep engaging, keep showing up even in difficult moments. This sounds healthy until you add the Accidental Narcissist piece: you're causing harm you genuinely don't see while remaining persistently present. You don't give people space because you don't withdraw, and your hypervigilance tracks everything except your own impact.</p>
 
-                        <h3>What this might mean:</h3>
-                        <p>Either: (1) You're cycling between states (offline sometimes, calculated other times), (2) Some questions didn't land right, or (3) You're purposeful in ways you're not consciously aware of.</p>
-
-                        <h3>Your path:</h3>
-                        <ul>
-                            <li>Retake the quiz focusing on your most common state</li>
-                            <li>Or contact for personalized interpretation of this pattern</li>
-                            <li>Consider whether you're actually cycling (which would be System Overload)</li>
-                        </ul>
-
-                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
-                    `
-                },
-                'offline_nonethical_purposeful': {
-                    title: 'Offline Protection + Non-Ethical + Purposeful',
-                    subtitle: 'Contradiction to Examine',
-                    content: `
-                        <p>Your answers suggest you're mostly offline/dissociated, no active conscience, AND purposeful harm. This is contradictory - you can't strategically hurt people while dissociated.</p>
-
-                        <h3>What this might mean:</h3>
-                        <p>Either: (1) You're more aware than "offline" suggests, (2) You're cycling between states, or (3) Some questions need clarification.</p>
-
-                        <h3>Your path:</h3>
-                        <ul>
-                            <li>Retake focusing on whether you're actually "online" (tracking, remembering, aware)</li>
-                            <li>Or contact for personalized pattern interpretation</li>
-                        </ul>
-
-                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
-                    `
-                },
-                'online_ethical_purposeful': {
-                    title: 'Online Protection + Ethical + Purposeful',
-                    subtitle: 'Strategic But Remorseful',
-                    content: `
-                        <p>You're hypervigilant (tracking everything constantly), you have active conscience (guilt stays with you), but you've admitted to purposefully causing harm.</p>
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're running them over while looking them directly in the eye. When they need space, you don't give it because you don't have that protective withdrawal response. Your presence feels relentless - you're always tracking, always engaging, always there, but you're not seeing how exhausting that intensity is or noticing when you've crossed their boundaries. They can't get distance from you even when they desperately need it because you don't disappear.</p>
 
                         <h3>What this means:</h3>
-                        <p>You see what you're doing, you feel bad about it, but you do it anyway. Either the harm feels necessary for survival, or there's a disconnect between remorse and behavior change.</p>
+                        <p>Your inability to withdraw is as damaging as other people's disappearing acts. You need to learn that sometimes the most loving thing you can do is back the fuck off.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>All War Fronts Framework - your hypervigilance needs direction and boundaries</li>
+                            <li>Learn deliberate withdrawal - going offline strategically instead of never at all</li>
+                            <li>Build capacity to recognize when your presence is harmful even if your intent isn't</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Praise for "never giving up" or "always being there." Persistence without awareness of impact is just steamrolling with good intentions.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_ethical_trauma_purposeful': {
+                    title: 'Online + Trauma Avoidant + Purposeful',
+                    subtitle: 'Aware and Choosing Harm',
+                    content: `
+                        <p>You're hypervigilant - tracking everything constantly. You disappear when genuinely overwhelmed. You have active conscience - guilt stays with you. But you've admitted to purposefully causing harm. You see what you're doing, you feel bad about it, but you do it anyway. Either the harm feels necessary for survival, or there's a disconnect between remorse and behavior change.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're watching them carefully, seeing exactly how your actions land, choosing to cause harm anyway, and then feeling guilty about it. They experience you as someone who understands impact but doesn't let that understanding stop you. Your remorse might look like accountability, but it never prevents the next incident. They're stuck with someone who sees them, knows they're hurting them, and does it anyway.</p>
+
+                        <h3>What this means:</h3>
+                        <p>The hypervigilance gives you clarity about your impact. The conscience gives you guilt about it. But neither stops the pattern. You're making informed choices to harm while feeling bad about those choices.</p>
 
                         <h3>Your path:</h3>
                         <ul>
@@ -837,27 +1094,480 @@
                             <li>All War Fronts work alongside intensive accountability</li>
                         </ul>
 
+                        <h3>What you DON'T need:</h3>
+                        <p>More awareness about your impact. You already see it. The question is why you keep choosing it.</p>
+
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
                 },
-                'online_nonethical_purposeful': {
-                    title: 'Online Protection + Non-Ethical + Purposeful',
-                    subtitle: 'Strategic and Calculating',
+
+                'online_ethical_ego_purposeful': {
+                    title: 'Online + Ego Avoidant + Purposeful',
+                    subtitle: 'Strategic Harm With Performed Remorse',
                     content: `
-                        <p>You're hypervigilant (tracking everything), you're not accessing remorse, AND you purposefully hurt people. You see what you're doing and choose to do it without guilt stopping you.</p>
+                        <p>You're hypervigilant, you disappear to avoid accountability (not overwhelm), you have conscience, but you also purposefully harm people. You're tracking everything, making calculated choices to hurt people, exiting before consequences, then feeling guilty after - but the guilt never stops the pattern.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're deliberately harming them while tracking their reactions, disappearing strategically when accountability approaches, and performing remorse that looks real but changes nothing. They're trapped with someone who weaponizes awareness and performs conscience.</p>
 
                         <h3>What this means:</h3>
-                        <p>This is calculated harm without conscience anchoring your behavior. The hypervigilance gives you data, and you use it strategically without remorse.</p>
+                        <p>The hypervigilance, the strategic exits, and the guilt might all be real - but they're serving harm, not preventing it.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Intensive professional accountability work</li>
+                            <li>Honest question: Is the remorse real or performed?</li>
+                            <li>If genuinely trying to change: supervised intervention</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_ethical_non_purposeful': {
+                    title: 'Online + Non-Avoidant + Purposeful',
+                    subtitle: 'Relentless Calculated Harm',
+                    content: `
+                        <p>You're hypervigilant, you don't disappear, you have conscience, but you purposefully harm people. You're tracking everything, staying present, making calculated choices to hurt people, and feeling guilty after - but never stopping.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're deliberately harming them while watching them closely, refusing to give them space from your presence, and carrying guilt that looks like accountability but prevents nothing. They're experiencing purposeful harm with no escape and remorse with no change.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're aware enough to choose harm, persistent enough to give no relief, and guilty enough to seem remorseful - but the pattern continues.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Professional intervention immediately</li>
+                            <li>Learn forced withdrawal - give people breaks from you</li>
+                            <li>Intensive accountability work</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_nonethical_trauma_accidental': {
+                    title: 'Online + Trauma Avoidant + No Remorse',
+                    subtitle: 'Hypervigilant Without Conscience',
+                    content: `
+                        <p>You're hypervigilant - tracking everything constantly, remembering details, adjusting in real-time. But you're not accessing remorse circuits. When you disappear, it's from genuine overwhelm (trauma response), not ego protection. When you hurt people, you're blind to it despite all that awareness, and you don't feel bad about it after. The hypervigilance gives you data about everything except your own impact, and the guilt circuits that should fire when you learn about harm aren't activating.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're intensely present and tracking their every reaction until your system overloads and you vanish. During the intense presence, you're causing harm you don't see - and when they tell you about it later, you don't feel remorse. They experience whiplash between your overwhelming attention and your complete absence, with no accountability or repair in either state. When you come back from disappearing, there's no guilt or attempt to make things right.</p>
+
+                        <h3>What this means:</h3>
+                        <p>The hypervigilance is survival response, the disappearing is system protection, but the lack of remorse is either extreme overwhelm blocking access to feelings OR structural absence of that wiring. You need to stabilize before you can even assess which one it is.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>All War Fronts Framework - understand why every defense is firing while conscience isn't</li>
+                            <li>Once somewhat stable: honest assessment of whether you CAN access remorse or if it's genuinely not there</li>
+                            <li>If remorse circuits are absent: this work focuses on managing your pattern, not healing a wound that might not exist</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Shame about not feeling bad. First figure out if you can't access it or if it's not there. The answer changes everything.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_nonethical_ego_accidental': {
+                    title: 'Online + Ego Avoidant + No Remorse',
+                    subtitle: 'Strategic Without Conscience',
+                    content: `
+                        <p>You're hypervigilant and tracking everything, you're not accessing remorse, and when you disappear it's to avoid discomfort or being seen as wrong - not because you're overwhelmed. When you hurt people, you're blind to it in the moment despite all your awareness, and you don't feel bad about it after. Your tracking skills help you know exactly when to exit before accountability arrives.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're watching them carefully, causing harm you somehow don't see, and leaving before they can address it - with no remorse driving you to stay and repair. They're stuck in a cycle where you're either intensely present (but damaging) or strategically absent (avoiding consequences), and you feel no guilt about either. The hypervigilance they might mistake for care is actually you tracking when to engage and when to escape.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You have the awareness to track reactions and the strategic capacity to avoid accountability, but you're missing both impact awareness and remorse. This is compartmentalization - the strategy and the harm exist in separate boxes that don't communicate.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Ground Zero Framework - this addresses compartmentalization that won't integrate through conventional methods</li>
+                            <li>Honest assessment: Can you access remorse if you tried, or is that wiring genuinely absent?</li>
+                            <li>If conscience circuits aren't there: you need to know whether you're protecting others from your pattern or expecting them to adapt to it</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Self-guided frameworks if remorse is truly absent. You need supervised accountability work and honest evaluation of whether change is possible or desirable for you.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_nonethical_non_accidental': {
+                    title: 'Online + Non-Avoidant + No Remorse',
+                    subtitle: 'Persistent Steamroller Without Conscience',
+                    content: `
+                        <p>You're hypervigilant, tracking everything constantly, you don't access remorse circuits, and you DON'T disappear - you stay present even when things get difficult. When you hurt people, you're genuinely blind to it despite all that awareness, and you don't feel bad about it after. You're persistently engaged, causing damage you don't see, with no guilt motivating repair and no withdrawal giving people breaks from your intensity.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're relentlessly present, tracking their every reaction but somehow missing your own impact, causing harm without seeing it, and feeling no remorse when they tell you about it. They can't get space from you because you don't withdraw, and they can't get accountability from you because you don't feel bad. Your hypervigilance feels invasive rather than attentive - you're always there, always watching, but never actually seeing what you're doing to them.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're effective at presence and tracking but disconnected from both impact awareness and remorse. This combination creates relentless harm - you never leave, you never see it, and you never feel bad about it.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Ground Zero Framework if the compartmentalization is architectural fracture</li>
+                            <li>All War Fronts work - your defenses are active but conscience isn't</li>
+                            <li>Honest assessment: Is remorse blocked or genuinely absent? Can you learn to track impact even without guilt driving you?</li>
+                            <li>Learn strategic withdrawal - you need to give people space even if it doesn't come naturally</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Praise for consistency or persistence. You need circuit breakers and accountability, and those might need to come from external structure if internal remorse isn't available.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_nonethical_trauma_purposeful': {
+                    title: 'Online + Trauma Avoidant + Calculated Harm',
+                    subtitle: 'Aware Harm Without Remorse',
+                    content: `
+                        <p>You're hypervigilant, you disappear when genuinely overwhelmed, you're not accessing remorse, AND you purposefully hurt people. You see what you're doing, choose to do it, disappear when it gets too intense, and don't feel bad about any of it.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're tracking them closely, making calculated choices to harm them, disappearing when your system overloads, and showing zero remorse. They're experiencing purposeful harm, strategic presence/absence, and no conscience creating accountability.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're aware enough to choose harm, dysregulated enough to disappear, and missing the remorse circuits that would interrupt either pattern.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Immediate professional intervention</li>
+                            <li>Honest question: Are you trying to change?</li>
+                            <li>If yes: intensive supervised work addressing both the harm and the absence of remorse</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_nonethical_ego_purposeful': {
+                    title: 'Online + Ego Avoidant + Calculated Harm',
+                    subtitle: 'Strategic Harm Without Conscience',
+                    content: `
+                        <p>You're hypervigilant - tracking everything, remembering details, adjusting in real-time. You're not accessing remorse. AND you purposefully hurt people. You see what you're doing, you choose to do it, and you don't feel bad about it. The hypervigilance gives you data, and you use it strategically to cause calculated harm without guilt.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're watching them closely, seeing exactly how to hurt them effectively, choosing to do it, and feeling nothing about it. They're dealing with someone who uses awareness as a weapon - your tracking skills tell you where they're vulnerable, and you aim for those spots. There's no accident, no remorse, no repair. Just calculated harm delivered by someone who sees everything.</p>
+
+                        <h3>What this means:</h3>
+                        <p>This is calculated harm without conscience anchoring your behavior. The hypervigilance gives you precision, and the lack of remorse means nothing stops you.</p>
 
                         <h3>Your path:</h3>
                         <ul>
                             <li>Honest question: Are you here to change or to get better at this?</li>
-                            <li>If genuinely trying to change: intensive clinical accountability work</li>
-                            <li>If not: this framework isn't for you</li>
+                            <li>If genuinely trying to change: intensive clinical accountability work with someone who specializes in this pattern</li>
+                            <li>If not: this framework isn't for you, and you need to be honest with people about what they're signing up for</li>
                         </ul>
 
                         <h3>What you DON'T need:</h3>
                         <p>Self-guided trauma healing. You need supervised intervention if you want to change, or honest acknowledgment if you don't.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'online_nonethical_non_purposeful': {
+                    title: 'Online + Non-Avoidant + Calculated Harm',
+                    subtitle: 'Relentless Strategic Damage',
+                    content: `
+                        <p>You're hypervigilant, you don't disappear, you're not accessing remorse, AND you purposefully harm people. You're tracking everything, staying relentlessly present, making calculated choices to hurt people, and feeling no guilt about any of it.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're deliberately harming them while watching them closely, refusing to give them any space, and showing zero remorse. They're experiencing calculated harm with no breaks, no accountability, and no conscience interrupting the pattern.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're using hypervigilance to optimize harm, persistence to prevent escape, with no remorse creating any internal motivation to stop.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Immediate professional intervention</li>
+                            <li>Honest question: Are you trying to change or understand yourself better to be more effective?</li>
+                            <li>If genuinely trying to change: intensive supervised work</li>
+                            <li>If not: this framework is not for you</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                // OFFLINE PROTECTION RESULTS
+                'offline_ethical_trauma_accidental': {
+                    title: 'Offline + Trauma Avoidant + Accidental',
+                    subtitle: 'The Dissociative Disappearer',
+                    content: `
+                        <p>You're operating mostly offline - your system protects you by removing you from intense situations. You go blank, space out, genuinely don't remember conflicts. When you disappear further, it's because your nervous system is forcing you out - you're not choosing to leave, you're being ejected for your own protection. When people say you hurt them, you're confused because you weren't really present when it happened. You DO have conscience - you feel terrible when you find out - but you can't see your patterns in real-time because you're literally not there.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're in a relationship with someone who disappears during every difficult moment - not by choice, but by nervous system override. They experience you as checked out, vacant, "not really there" during the times they most need you present. When they try to repair or process what happened, you genuinely can't remember it, which makes them feel crazy. They're doing all the emotional labor of the relationship because you're offline whenever things get real.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You're not choosing to disappear, your system learned that not being there means safer. But now it's keeping you offline when you need to be present, and your partner is carrying the full weight of the relationship alone.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Mirror Archetype Quiz - Find out which specific protection pattern you're running</li>
+                            <li>Wound Matrix - Identify which core wounds are driving your system offline</li>
+                            <li>Your archetype workbook - Learn to recognize the early signs before you fully disappear</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>People yelling at you to "pay attention." You need to understand what you're protecting so your system can learn it's safe to stay online.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_ethical_ego_accidental': {
+                    title: 'Offline + Ego Avoidant + Accidental',
+                    subtitle: 'The Convenient Fogger',
+                    content: `
+                        <p>You're mostly offline - you space out, don't remember conflicts, go blank during difficult moments. But when you disappear further, it's not just nervous system protection - there's also a convenient side effect where going foggy means you don't have to deal with accountability or discomfort. You may have started dissociating as trauma response, but now it's also serving ego protection. When you hurt people, you're genuinely unaware in the moment, but the amnesia also gets you out of having to face what you've done.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They can't tell if you're genuinely dissociated or strategically checked out. Every time they try to address something, you "don't remember" or you're "too foggy to engage right now." They're stuck in a pattern where they can never hold you accountable because you're conveniently absent whenever consequences show up. Over time, they stop trying because what's the point of addressing problems with someone who won't remember the conversation?</p>
+
+                        <h3>What this means:</h3>
+                        <p>The dissociation might have started as protection, but now it's also a way to avoid discomfort. Both things can be true - you might be genuinely offline AND benefiting from not having to stay present for hard shit.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Mirror Archetype Quiz first - you need to see the pattern before anything else can work</li>
+                            <li>Honest assessment: When you "can't remember," is it truly unavailable or is it uncomfortable to access?</li>
+                            <li>Accountability work alongside trauma work - you need both</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Excuses about why you can't engage. If the fog is serving you, you need to admit that.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_ethical_non_accidental': {
+                    title: 'Offline + Non-Avoidant + Accidental',
+                    subtitle: 'The Dissociated Persistence',
+                    content: `
+                        <p>You're mostly offline - spacing out, going blank, not tracking what's happening in real-time. But you DON'T disappear relationally - you stay physically present even when you're mentally gone. This creates a confusing dynamic where you're "there" but not actually there. When you hurt people, you're genuinely unaware because you're dissociated, but you also don't leave, so they're stuck engaging with someone who's only partially present.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're talking to a shell. You're physically in the room but mentally checked out, and you won't give them the relief of actual distance. They experience you as vacant, disconnected, going through motions - but you keep showing up in that state instead of stepping back when you're not actually available. It's like being in a relationship with a ghost who won't leave. They can't get your real presence, but they also can't get clean space from you.</p>
+
+                        <h3>What this means:</h3>
+                        <p>Your body stays but your consciousness leaves, and that's somehow worse than full disappearance. People need you either present or absent - the half-there state is crazymaking.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Mirror Archetype Quiz - identify which dissociative pattern you're running</li>
+                            <li>Learn to recognize when you've gone offline so you can communicate it instead of pretending you're present</li>
+                            <li>Build capacity for deliberate withdrawal - it's kinder to leave fully than to stay as a ghost</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Credit for "showing up." You're not actually there and everyone knows it.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_ethical_trauma_purposeful': {
+                    title: 'Offline + Trauma Avoidant + Purposeful',
+                    subtitle: 'Contradiction to Examine',
+                    content: `
+                        <p>Your answers suggest you're mostly offline/dissociated, you disappear from genuine overwhelm, you have active conscience, but you've also indicated purposeful harm. This is contradictory - you can't strategically hurt people while genuinely dissociated.</p>
+
+                        <h3>What this might mean:</h3>
+                        <p>Either you're cycling between states (offline sometimes, calculated other times - which would be System Overload), some questions didn't land right, or you're purposeful in ways you're not consciously aware of.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Retake the quiz focusing on your most common state</li>
+                            <li>Or contact for personalized interpretation of this pattern</li>
+                            <li>Consider whether you're actually cycling between states (which changes the category entirely)</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_ethical_ego_purposeful': {
+                    title: 'Offline + Ego Avoidant + Purposeful',
+                    subtitle: 'Contradiction to Examine',
+                    content: `
+                        <p>Your answers suggest you're mostly offline/dissociated, you disappear to avoid accountability (not overwhelm), you have conscience, but you also purposefully harm people. This combination doesn't compute - you can't be both dissociated AND strategically harmful.</p>
+
+                        <h3>What this might mean:</h3>
+                        <p>Either you're more aware than "offline" suggests, you're cycling between dissociation and calculation, or some questions need clarification.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Retake focusing on whether you're actually tracking and aware (which would be "online")</li>
+                            <li>Or contact for personalized pattern interpretation</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_ethical_non_purposeful': {
+                    title: 'Offline + Non-Avoidant + Purposeful',
+                    subtitle: 'Contradiction to Examine',
+                    content: `
+                        <p>Your answers suggest you're mostly offline/dissociated, you don't disappear relationally, you have conscience, but you also purposefully harm people. This is contradictory - you can't make calculated choices to harm while dissociated.</p>
+
+                        <h3>What this might mean:</h3>
+                        <p>Either you're more present than "offline" suggests, or there's confusion about what constitutes "purposeful" harm versus accidental harm while dissociated.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Retake the quiz focusing on awareness levels</li>
+                            <li>Or contact for personalized interpretation</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_nonethical_trauma_accidental': {
+                    title: 'Offline + Trauma Avoidant + No Remorse',
+                    subtitle: 'Dissociated Without Conscience',
+                    content: `
+                        <p>You're mostly offline - dissociated, can't remember conflicts, genuinely confused when people say you hurt them. When you disappear further, it's from genuine overwhelm, not ego protection. You're not accessing remorse circuits - no guilt stays with you after you learn about harm. When you hurt people, it's accidental (you're not aware enough to be purposeful), but you also don't feel bad about it.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're in a relationship with someone who's rarely fully present, can't remember hurting them, and doesn't feel bad when told about it. You're not there during difficult moments (dissociated), you're really not there when you fully withdraw (trauma shutdown), and when you come back you have no memory and no remorse. They're carrying the full emotional weight of the relationship with someone who's both absent and unaccountable.</p>
+
+                        <h3>What this means:</h3>
+                        <p>This could be extreme dissociation blocking access to both memory AND feelings, or it could be that remorse wiring was never built or got shut off early. You're so offline that you can't assess your own internal landscape.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Mirror Archetype Quiz FIRST - you need to see your patterns before anything else can work</li>
+                            <li>Come online enough to assess whether remorse is buried under dissociation or genuinely absent</li>
+                            <li>If conscience circuits truly aren't there: this work focuses on managing your pattern, not healing a wound that might not exist</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>People telling you that you should feel bad. If you don't, you don't. The question is whether you CAN'T access it or genuinely don't have it.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_nonethical_ego_accidental': {
+                    title: 'Offline + Ego Avoidant + No Remorse',
+                    subtitle: 'Convenient Dissociation Without Conscience',
+                    content: `
+                        <p>You're mostly offline - spacing out, not remembering conflicts Commonwealth, going blank. When you disappear further, it's to avoid discomfort or accountability, not from overwhelm. You're not accessing remorse - no guilt about harm caused. The dissociation might have started as protection, but now it's also conveniently getting you out of facing consequences, and you don't feel bad about any of it.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>You're checked out during difficult moments, you disappear entirely when accountability might show up, you don't remember conversations about your impact, and you don't feel remorse when they explain what you've done. They can't tell if you're genuinely dissociated or strategically foggy, but either way you're unavailable for repair or accountability. The relationship exists in a void where nothing they say lands or sticks.</p>
+
+                        <h3>What this means:</h3>
+                        <p>The dissociation serves multiple purposes - protection from threat AND protection from consequences - and there's no guilt circuit interrupting the pattern. You might be so offline that you can't access remorse, or the wiring might not be there at all.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Mirror Archetype Quiz first</li>
+                            <li>Honest assessment: Is the fog protecting you from pain or from accountability? Both?</li>
+                            <li>Can you access remorse if you came online, or is it structurally absent?</li>
+                            <li>If conscience isn't there: you need to know that about yourself and decide what you're doing with that information</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Validation for dissociation if it's serving ego protection. And if remorse isn't there, you need honest evaluation, not healing frameworks built for people with active conscience.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_nonethical_non_accidental': {
+                    title: 'Offline + Non-Avoidant + No Remorse',
+                    subtitle: 'Ghost Without Conscience',
+                    content: `
+                        <p>You're mostly offline - dissociated, not tracking in real-time, going blank. But you DON'T disappear relationally - you stay physically present even when mentally gone. You're not accessing remorse circuits. When you hurt people, you're unaware because you're dissociated, but you also don't feel bad when you find out. You're a shell that won't leave - physically there but mentally absent, causing harm without awareness or guilt.</p>
+
+                        <h3>What you're doing to your partner:</h3>
+                        <p>They're engaging with someone who's not really there, who won't give them the relief of actual distance, and who shows no remorse for the impact of that half-presence. You're going through motions in a dissociated state, hurting them through absence-while-present, and feeling nothing about it. They're trapped with a ghost who won't leave and won't feel bad about haunting them.</p>
+
+                        <h3>What this means:</h3>
+                        <p>You stay in body while leaving in mind, and there's no guilt circuit pushing you to either come back fully or leave completely. This is the most confusing version of harm - present but absent, damaging but unaware, persistent but empty.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Mirror Archetype Quiz - identify the dissociative pattern</li>
+                            <li>Come online enough to assess whether remorse exists under the dissociation</li>
+                            <li>Learn to fully leave when you're not actually present - it's kinder than staying as a ghost</li>
+                            <li>If remorse circuits aren't there: manage the pattern with external structure since internal motivation is absent</li>
+                        </ul>
+
+                        <h3>What you DON'T need:</h3>
+                        <p>Credit for showing up. You're not there and there's no guilt driving you to become actually present.</p>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_nonethical_trauma_purposeful': {
+                    title: 'Offline + Trauma Avoidant + Calculated Harm',
+                    subtitle: 'Contradiction to Examine',
+                    content: `
+                        <p>Your answers suggest you're mostly offline/dissociated, you disappear from overwhelm, you're not accessing remorse, AND you purposefully harm people. This is contradictory - you can't strategically hurt people while dissociated.</p>
+
+                        <h3>What this might mean:</h3>
+                        <p>Either you're more aware than "offline" suggests (possibly cycling between states), or there's confusion about purposeful versus accidental harm.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Retake focusing on awareness levels</li>
+                            <li>Or contact for personalized pattern interpretation</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_nonethical_ego_purposeful': {
+                    title: 'Offline + Ego Avoidant + Calculated Harm',
+                    subtitle: 'Contradiction to Examine',
+                    content: `
+                        <p>Your answers suggest you're mostly offline/dissociated, you disappear to avoid accountability, you're not accessing remorse, AND you're purposefully causing harm. This is contradictory - you can't be both dissociated AND strategically harmful.</p>
+
+                        <h3>What this might mean:</h3>
+                        <p>Either you're more aware than "offline" suggests (possibly Online with strategic disconnection), or some questions need clarification. True dissociation and purposeful harm don't coexist - one requires presence the other lacks.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Retake focusing on whether you're actually "online" (tracking, remembering, aware) during harm</li>
+                            <li>Or contact for personalized pattern interpretation</li>
+                        </ul>
+
+                        <a href="#" class="cta-button">Explore Recommended Next Steps</a>
+                    `
+                },
+
+                'offline_nonethical_non_purposeful': {
+                    title: 'Offline + Non-Avoidant + Calculated Harm',
+                    subtitle: 'Contradiction to Examine',
+                    content: `
+                        <p>Your answers suggest you're mostly offline/dissociated, you don't disappear relationally, you're not accessing remorse, AND you purposefully harm people. This combination is contradictory - you can't make calculated choices while dissociated.</p>
+
+                        <h3>What this might mean:</h3>
+                        <p>Either you're more present than "offline" suggests, or there's confusion about what constitutes purposeful versus accidental harm.</p>
+
+                        <h3>Your path:</h3>
+                        <ul>
+                            <li>Retake the quiz focusing on awareness levels</li>
+                            <li>Or contact for personalized interpretation</li>
+                        </ul>
 
                         <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                     `
@@ -867,9 +1577,10 @@
             // Default fallback
             const result = results[key] || {
                 title: 'Your Protection Style',
-                subtitle: `${nervous.charAt(0).toUpperCase() + nervous.slice(1)} + ${conscience.charAt(0).toUpperCase() + conscience.slice(1)} + ${intent.charAt(0).toUpperCase() + intent.slice(1)}`,
+                subtitle: `${nervous.charAt(0).toUpperCase() + nervous.slice(1)} + ${conscience.charAt(0).toUpperCase() + conscience.slice(1)} + ${avoidance.charAt(0).toUpperCase() + avoidance.slice(1)} + ${intent.charAt(0).toUpperCase() + intent.slice(1)}`,
                 content: `
                     <p>Your results show a unique combination of patterns. Contact us for personalized guidance on your specific pattern combination.</p>
+                    <p><strong>Your pattern:</strong> ${nervous} nervous system, ${conscience} conscience, ${avoidance} avoidant, ${intent} intent</p>
                     <a href="#" class="cta-button">Explore Recommended Next Steps</a>
                 `
             };
